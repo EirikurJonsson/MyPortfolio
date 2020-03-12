@@ -21,29 +21,27 @@ log_ret = np.log(df/df.shift(1))
 vol = log_ret.std()
 # init. empty data frame
 results = pd.DataFrame(columns = ["Size", "Return", "Volatility"])
-names = []
-for i in range(10):
+for i in range(100000):
     '''
     In this function we use random module to generate random integers (and list of integers)
     to use along side the pandas .iloc method to get the right subset of randomly generated
     portfolios
     '''
-    weights = np.random.random(20)  
-    weights /= np.sum(weights)
-    # size of portfolio is now fixed at 20
-    size = 20
-    population = range(500)
+    # random size of portfolio between 1 and 100
+    randomsize = random.randint(1, 100)
     # using randomsize to get same amount of random values between 1 and 500
-    assets = random.sample(population, size)
+    assets = random.sample(range(0,500), randomsize)
     # picking a random day to sell the position
-    a = log_ret.columns.values
-    names.append(a)
     randomday = random.sample(range(0,2556), 1)
+    # saving the size since that is one of our measures of volatility, i.e more assets = less vol.
+    size = len(assets)
     # Calculating the mean return for said portfolio on said day
     mean = log_ret.iloc[randomday, assets].mean(axis = 1)
     # Calculating the std(volatility) for random portfolio 
     std = np.sqrt(vol.iloc[assets].sum())/len(assets)
     #Append the results to the empty data frame
     results = results.append({"Size": size, "Return": mean[0], "Volatility": std}, ignore_index = True)
-
-print(len(names[1]))
+# df can be used for further ploting or calculation
+df = results.sort_values(by = "Size", ascending = False)
+# This is the answer to part 1, use for plotting and to generate describtive statistics
+df2 = df.groupby('Size').mean()
